@@ -57,6 +57,13 @@ def main():
         if not blockchain.blocks:  # Only call init if blocks list is empty
             blockchain.init()
             return
+    elif args.command == 'add':
+        case_id = args.case_id
+        item_ids = [int(id) for id in args.item_id]  # Convert item_ids to integers
+        creator = args.creator
+        password = args.password
+        blockchain.add_block(case_id, item_ids, creator, password)
+        return
 
     elif args.command == 'checkout':
         return 
