@@ -1,7 +1,11 @@
 import sys
 import argparse
-from blockchain import Blockchain
-from block import Block 
+import os
+from init import init
+from add import add_block
+from error import *
+
+BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Blockchain Chain of Custody Program")
@@ -51,18 +55,17 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    blockchain = Blockchain()  # Initialize the blockchain
     
     if args.command == 'init':
-        if not blockchain.blocks:  # Only call init if blocks list is empty
-            blockchain.init()
-            return
+        init(BLOCKCHAIN_FILE)
+        return
+        
     elif args.command == 'add':
         case_id = args.case_id
-        item_ids = [int(id) for id in args.item_id]  # Convert item_ids to integers
+        item_ids = [int(id) for id in args.item_id] 
         creator = args.creator
         password = args.password
-        blockchain.add_block(case_id, item_ids, creator, password)
+        add_block(case_id, item_ids, creator, password, BLOCKCHAIN_FILE)
         return
 
     elif args.command == 'checkout':
