@@ -53,6 +53,6 @@ def init(file_path):
                     f_append.write(genesis_block)
             else:
                 print("Genesis block already exists.")
-    sys.exit(0)
+    
 
 
