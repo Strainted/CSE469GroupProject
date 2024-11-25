@@ -34,8 +34,7 @@ GENESIS_BLOCK = {
 GENESIS_HASH = hashlib.sha256(create_block(GENESIS_BLOCK)).digest()
 
 def create_block(block_data):
-    state = block_data['state'].ljust(12, b'\0')
-    creator = block_data['creator'].ljust(12, b'\0')
+    
     DATA_FORMAT = struct.Struct(str(block_data['d_length']) + 's')
 
     return BLOCK_FORMAT.pack(
@@ -43,8 +42,8 @@ def create_block(block_data):
                        block_data['timestamp'],
                        block_data['case_id'],
                        block_data['evidence_id'],
-                       state,
-                       creator,
+                       block_data['state'],
+                       block_data['creator'],
                        block_data['owner'],
                        block_data['d_length'],
                     ) + DATA_FORMAT.pack(block_data['data'])

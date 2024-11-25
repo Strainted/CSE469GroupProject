@@ -16,3 +16,9 @@ def invalid_init_block():
 
 def invalid_blockchain():
     sys.exit(1)
+
+def bad_block():
+    sys.exit(1)
+
+def exit_0():
+    sys.exit(0)

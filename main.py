@@ -15,7 +15,7 @@ def parse_arguments():
     # Add command
     add_parser = subparsers.add_parser('add')
     add_parser.add_argument('-c', '--case_id', required=True)
-    add_parser.add_argument('-i', '--item_id', nargs='+', required=True)
+    add_parser.add_argument('-i', '--item_id', action='append', required=True)
     add_parser.add_argument('-g', '--creator', required=True)
     add_parser.add_argument('-p', '--password', required=True)
 
