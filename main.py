@@ -4,6 +4,8 @@ import os
 from init import init
 from add import add_block
 from error import *
+from checkout import *
+from checkin import *
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
@@ -69,9 +71,15 @@ def main():
         return
 
     elif args.command == 'checkout':
+        item_id = int(args.item_id)
+        password = args.password
+        check_out(item_id, password, BLOCKCHAIN_FILE)
         return 
 
     elif args.command == 'checkin':
+        item_id = int(args.item_id)
+        password = args.password
+        check_in(item_id, password, BLOCKCHAIN_FILE)
         return 
 
     elif args.command == 'show':

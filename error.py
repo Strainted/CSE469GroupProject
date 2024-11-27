@@ -22,3 +22,6 @@ def bad_block():
 
 def exit_0():
     sys.exit(0)
+
+def no_item_id():  
+    sys.exit(1)

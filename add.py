@@ -88,7 +88,6 @@ def add_block(case_id, item_ids, creator, password, file_path):
     
     verify_user(password)
         
-
     try:
         case_uuid = uuid.UUID(case_id)
     except ValueError:
@@ -167,7 +166,6 @@ def add_block(case_id, item_ids, creator, password, file_path):
 
     with open(file_path, 'ab') as f:
         for block in new_blocks:
-            print(block)
             f.write(block)
             for item_id in item_ids:
                 print(f"Added item: {item_id}")
