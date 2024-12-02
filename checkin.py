@@ -47,13 +47,13 @@ def check_in(item_id, password, file_path):
 
             decrypted_item_id = decrypt_data(curr_head.item_id, AES_KEY)
             item_id_int = int.from_bytes(decrypted_item_id, byteorder='big')
-            print("state:" + str(curr_head.state))
+            
             if item_id_int == item_id:
                 found = True
                 case_id = curr_head.case_id
                 creator = curr_head.creator
-            print(curr_head.state.rstrip(b'\x00'))
-            if curr_head.state.rstrip(b'\x00') in [b'CHECKEDIN', b'DISPOSED', b'RELEASED', b'']: #double check this works after doing remove
+            
+            if curr_head.state.rstrip(b'\x00') in [b'CHECKEDIN', b'DISPOSED', b'RELEASED', b'DESTROYED']: #double check this works after doing remove
                 checkedin = True
                 found = False
 
