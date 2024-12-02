@@ -6,6 +6,7 @@ from add import add_block
 from error import *
 from checkout import *
 from checkin import *
+from remove import *
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
@@ -91,6 +92,9 @@ def main():
             return
         
     elif args.command == 'remove':
+        return
+        
+
         return
     
     elif args.command == 'verify':

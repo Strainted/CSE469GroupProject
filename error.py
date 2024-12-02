@@ -25,3 +25,9 @@ def exit_0():
 
 def no_item_id():  
     sys.exit(1)
+
+def invalid_reason():
+    sys.exit(1)
+
+def missing_owner():
+    sys.exit(1)

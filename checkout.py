@@ -97,7 +97,6 @@ def verify_user(input_pass):
     passwords = get_passwords()
     for role, password in passwords.items():
         if input_pass == password:
-            print(role.encode())
             return role
     print("Invalid Password")
     invalid_password()
