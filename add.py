@@ -153,7 +153,7 @@ def add_block(case_id, item_ids, creator, password, file_path):
                 'timestamp': timestamp,
                 'case_id': encrypted_case_id,
                 'evidence_id': encrypted_item_id,
-                'state': b'CHECKEDIN\0\0',
+                'state': b'CHECKEDIN',
                 'creator': creator.encode(),
                 'owner': b'\0' * 12,
                 'd_length': 0, 

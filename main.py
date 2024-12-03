@@ -6,6 +6,7 @@ from add import add_block
 from error import *
 from checkout import *
 from checkin import *
+from remove import remove_item
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
@@ -91,9 +92,11 @@ def main():
             return
         
     elif args.command == 'remove':
-        return
-        
-
+        item_id = int(args.item_id)
+        reason = args.reason
+        password = args.password
+        owner = args.owner if reason == 'RELEASED' else None
+        remove_item(item_id, reason, password, owner, BLOCKCHAIN_FILE)
         return
     
     elif args.command == 'verify':
