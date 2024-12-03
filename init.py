@@ -1,3 +1,4 @@
+import hashlib
 import os
 import struct
 import argparse
@@ -20,7 +21,7 @@ GENESIS_BLOCK = {
 
 def create_block(block_data):
     """Create a binary representation of a block."""
-    block_format = '32s d 32s 32s 12s 12s 12s I 14s'
+    block_format = '32s d 32s 32s 11s 12s 12s I 14s'
     return struct.pack(block_format, 
                        block_data['prev_hash'],
                        block_data['timestamp'],
@@ -32,6 +33,52 @@ def create_block(block_data):
                        block_data['d_length'],
                        block_data['data'])
 
+def validate_blockchain(file_path):
+    """Validate the structure of an existing blockchain file."""
+    block_format = struct.Struct('32s d 32s 32s 12s 12s 12s I')
+    expected_genesis_block = create_block(GENESIS_BLOCK)
+
+    with open(file_path, 'rb') as f:
+        # Read and unpack the Genesis Block
+        first_block = f.read(block_format.size + 14)
+        if len(first_block) < block_format.size + 14:
+            print("Error: Genesis Block is incomplete or corrupted.", file=sys.stderr)
+            sys.exit(1)
+
+        # Unpack the Genesis Block
+        try:
+            unpacked_block = block_format.unpack(first_block[:block_format.size])
+            data = first_block[block_format.size:]
+        except struct.error:
+            print("Error: Genesis Block is corrupted.", file=sys.stderr)
+            sys.exit(1)
+
+        first_block = f.read(struct.calcsize('32s d 32s 32s 12s 12s 12s I 14s'))
+        # Validate Genesis Block
+        if first_block != create_block(GENESIS_BLOCK):
+            print("Error: Invalid Genesis Block.", file=sys.stderr)
+            sys.exit(1)
+
+        # Optional: Validate subsequent blocks (recommended for full validation)
+        prev_hash = hashlib.sha256(expected_genesis_block).digest()
+        while True:
+            head = f.read(block_format.size)
+            if not head:
+                break
+            try:
+                block_head = block_format.unpack(head)
+                data_length = block_head[-1]
+                data = f.read(data_length)
+                curr_hash = hashlib.sha256(head + data).digest()
+
+                if block_head[0] != prev_hash:
+                    print("Error: Invalid blockchain structure (hash mismatch).", file=sys.stderr)
+                    sys.exit(1)
+
+                prev_hash = curr_hash
+            except Exception:
+                print("Error: Corrupted block detected.", file=sys.stderr)
+                sys.exit(1)
 def init(file_path):
     block_head_format = struct.Struct('32s d 32s 32s 12s 12s 12s I')
     block_head = namedtuple('Block_Head', 'prev_hash timestamp case_id evidence_id state creator owner data_length')
@@ -45,14 +92,24 @@ def init(file_path):
         print("Blockchain file not found. Created INITIAL block.")
     else: #file exists check if genesis block exists
         with open(file_path, 'rb') as f:
-            first_block = f.read(struct.calcsize('32s d 32s 32s 12s 12s 12s I 14s'))
+            block_format = struct.Struct('32s d 32s 32s 12s 12s 12s I')
+            first_block = f.read(block_format.size + 14)
+            if len(first_block) < block_format.size + 14:
+                print("Error: Genesis Block is incomplete or corrupted.", file=sys.stderr)
+                sys.exit(1)
+                # Unpack the Genesis Block
+            try:
+                unpacked_block = block_format.unpack(first_block[:block_format.size])
+                data = first_block[block_format.size:]
+            except struct.error:
+                print("Error: Genesis Block is corrupted.", file=sys.stderr)
+                sys.exit(1)
+
             if first_block != create_block(GENESIS_BLOCK):
+                sys.exit(0)
                 print("Genesis block not found. Appending the Genesis block.")
                 with open(file_path, 'ab') as f_append:
                     genesis_block = create_block(GENESIS_BLOCK)
                     f_append.write(genesis_block)
             else:
                 print("Genesis block already exists.")
-    
-
-

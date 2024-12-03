@@ -9,13 +9,13 @@ from add import create_block, encrypt_data, decrypt_data, get_passwords
 import struct
 import hashlib
 
+
 AES_KEY = b"R0chLi4uLi4uLi4="
 BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
 
-def check_out(item_id, password, file_path):
 
+def check_out(item_id, password, file_path):
     owner = verify_user(password)
-    
 
     if not os.path.exists(file_path):
         print("Block chain file does not exist")
@@ -30,11 +30,11 @@ def check_out(item_id, password, file_path):
         found = False
         case_id = None
         removed = False
-        
+
         prev_hash = ''
         while True:
             head = f.read(BLOCK_FORMAT.size)
-            if not head: 
+            if not head:
                 break
             curr_head = block_head._make(BLOCK_FORMAT.unpack(head))
             prev_ids.append(curr_head.item_id)
@@ -49,11 +49,11 @@ def check_out(item_id, password, file_path):
                 found = True
                 case_id = curr_head.case_id
                 creator = curr_head.creator
-            
-            if curr_head.state.rstrip(b'\x00') in [b'DISPOSED', b'DESTROYED', b'RELEASED']: #double check this works after doing remove
+
+            if curr_head.state.rstrip(b'\x00') in [b'DISPOSED', b'DESTROYED',
+                                                   b'RELEASED']:  # double check this works after doing remove
                 removed = True
                 found = False
-
 
     if not found:
         if removed == True:
@@ -62,7 +62,7 @@ def check_out(item_id, password, file_path):
         else:
             print("Item_id not found in Blockchain")
             no_item_id()
-    
+
     now = datetime.now()
     timestamp = datetime.timestamp(now)
 
@@ -80,7 +80,6 @@ def check_out(item_id, password, file_path):
 
     new_block = create_block(block_data)
 
-
     with open(file_path, 'ab') as f:
         f.write(new_block)
         print(f"Case: {decrypt_data(case_id, AES_KEY)}")
@@ -88,9 +87,8 @@ def check_out(item_id, password, file_path):
         print("Status: CHECKEDOUT")
         print(f"Time of action: {datetime.now().isoformat()}Z")
 
-    
     return True
-    
+
 
 def verify_user(input_pass):
     passwords = get_passwords()
@@ -99,5 +97,5 @@ def verify_user(input_pass):
             return role
     print("Invalid Password")
     invalid_password()
-    
+
     return True
