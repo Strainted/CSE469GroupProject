@@ -8,6 +8,7 @@ from checkout import *
 from checkin import *
 from remove import remove_item
 from show import *
+from verify import verify_blockchain
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
@@ -104,9 +105,10 @@ def main():
         owner = args.owner if reason == 'RELEASED' else None
         remove_item(item_id, reason, password, owner, BLOCKCHAIN_FILE)
         return
-    
+
     elif args.command == 'verify':
-       return
+        verify_blockchain(BLOCKCHAIN_FILE)
+        return
 
 if __name__ == "__main__":
     main()
