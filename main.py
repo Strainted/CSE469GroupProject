@@ -7,6 +7,7 @@ from error import *
 from checkout import *
 from checkin import *
 from remove import remove_item
+from show import *
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
@@ -39,12 +40,13 @@ def parse_arguments():
     show_cases_parser.add_argument('-i', '--item_id')
     show_cases_parser.add_argument('-n', '--num_entries', type=int)
     show_cases_parser.add_argument('-r', '--reverse', action='store_true')
-    show_cases_parser.add_argument('-p', '--password', required=True)
+    show_cases_parser.add_argument('-p', '--password', required=False)
 
     # Remove command
     remove_parser = subparsers.add_parser('remove')
     remove_parser.add_argument('-i', '--item_id', required=True)
-    remove_parser.add_argument('-y', '--reason', required=True, choices=['DISPOSED', 'DESTROYED', 'RELEASED'])
+    remove_parser.add_argument('-y', '--reasonY', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'], dest='reason')
+    remove_parser.add_argument('--why', '--reasonW', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'], dest='reason')
     remove_parser.add_argument('-p', '--password', required=True)
     remove_parser.add_argument('-o', '--owner')
 
@@ -85,6 +87,7 @@ def main():
 
     elif args.command == 'show':
         if args.subcommand == 'cases':
+            show_cases(BLOCKCHAIN_FILE)
             return
         elif args.subcommand == 'items':
             return
@@ -93,8 +96,11 @@ def main():
         
     elif args.command == 'remove':
         item_id = int(args.item_id)
-        reason = args.reason
         password = args.password
+        if args.reason is None:
+            print("Error: One of the arguments '-y' or '--why' must be provided.")
+            sys.exit(1)
+        reason = args.reason
         owner = args.owner if reason == 'RELEASED' else None
         remove_item(item_id, reason, password, owner, BLOCKCHAIN_FILE)
         return

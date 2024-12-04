@@ -44,16 +44,17 @@ def check_out(item_id, password, file_path):
             prev_hash = hashlib.sha256(head + data).digest()
 
             decrypted_item_id = decrypt_data(curr_head.item_id, AES_KEY)
-            item_id_int = int.from_bytes(decrypted_item_id, byteorder='big')
-            if item_id_int == item_id:
+            # Convert decrypted item_id to integer for comparison
+            decrypted_item_id_int = int.from_bytes(decrypted_item_id, byteorder='big')
+
+            if decrypted_item_id_int == item_id:
                 found = True
                 case_id = curr_head.case_id
                 creator = curr_head.creator
 
-            if curr_head.state.rstrip(b'\x00') in [b'DISPOSED', b'DESTROYED',
-                                                   b'RELEASED']:  # double check this works after doing remove
-                removed = True
-                found = False
+                if curr_head.state.rstrip(b'\x00') in [b'DISPOSED', b'DESTROYED', b'RELEASED']:
+                    removed = True
+                    found = False
 
     if not found:
         if removed == True:
