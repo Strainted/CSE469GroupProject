@@ -50,11 +50,13 @@ def check_in(item_id, password, file_path):
                 found = True
                 case_id = curr_head.case_id
                 creator = curr_head.creator
+                if curr_head.state.rstrip(b'\x00') in [b'CHECKEDOUT']:
+                    checkedin = False
 
-            if curr_head.state.rstrip(b'\x00') in [b'CHECKEDIN', b'DISPOSED', b'RELEASED',
-                                                   b'DESTROYED']:  # double check this works after doing remove
-                checkedin = True
-                found = False
+                if curr_head.state.rstrip(b'\x00') in [b'CHECKEDIN', b'DISPOSED', b'RELEASED',
+                                                    b'DESTROYED']:  # double check this works after doing remove
+                    checkedin = True
+                    found = False
 
     if not found:
         if checkedin == True:
