@@ -41,28 +41,31 @@ def show_cases(file_path, password=None):
                 f.read(block_head.data_length)  # Skip block data
                 continue
 
-            # Decrypt case_id or show encrypted value based on password validity
             try:
+                # Decrypt case_id or show encrypted value based on password validity
                 if verify_password(password):
-                    decrypted_case_id = uuid.UUID(bytes=decrypt_data(block_head.case_id, AES_KEY))
-                    case_id_value = str(decrypted_case_id)  # Proper UUID format
+                    decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY)
+                    if len(decrypted_case_id) == 16:
+                        case_id_value = str(uuid.UUID(bytes=decrypted_case_id))  # Proper UUID format
+                    else:
+                        raise ValueError("Decrypted case_id is not 16 bytes long.")
                 else:
                     # Fallback for invalid/missing password
                     case_id_value = block_head.case_id.hex()
                 unique_cases.add(case_id_value)
-            except (ValueError, Exception):
-                print("Error: Invalid or malformed case_id in the blockchain.", file=sys.stderr)
+            except (ValueError, Exception) as e:
+                print(f"Error: Invalid or malformed case_id in the blockchain. Details: {e}", file=sys.stderr)
                 sys.exit(1)
 
             # Skip block data
             f.read(block_head.data_length)
 
     # Display the unique cases
-    #print("Displaying all cases:")
     for i, case_id in enumerate(unique_cases, start=1):
         print(f"- Case {i}: {case_id}")
 
     return
+
 
 
 def show_items(file_path, case_id=None):
