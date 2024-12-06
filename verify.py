@@ -9,7 +9,8 @@ from collections import namedtuple
 from add import decrypt_data, AES_KEY, BLOCK_FORMAT
 from error import *
 from init import GENESIS_BLOCK, create_block
-
+# This function was generated with assistance from ChatGPT, an AI tool developed by OpenAI.
+# Reference: OpenAI. (2024). ChatGPT [Large language model]. openai.com/chatgpt
 def verify_blockchain(file_path):
     if not os.path.exists(file_path):
         print("Error: Blockchain file does not exist.", file=sys.stderr)
