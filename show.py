@@ -3,8 +3,9 @@ import os
 import sys
 import uuid
 from collections import namedtuple
-from add import decrypt_data, encrypt_data, AES_KEY, BLOCK_FORMAT
+from add import decrypt_data, AES_KEY, BLOCK_FORMAT
 from init import GENESIS_BLOCK
+
 
 def verify_password(password):
     # Password verification logic (mock example)
@@ -12,6 +13,7 @@ def verify_password(password):
     if password in valid_passwords:
         return True
     return False
+
 
 def show_cases(file_path, password=None):
     if not os.path.exists(file_path):
@@ -42,12 +44,12 @@ def show_cases(file_path, password=None):
             # Decrypt case_id or show encrypted value based on password validity
             try:
                 if verify_password(password):
-                    decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY)
-                    case_id_uuid = str(uuid.UUID(bytes=decrypted_case_id))  # Convert to UUID format
+                    decrypted_case_id = uuid.UUID(bytes=decrypt_data(block_head.case_id, AES_KEY))
+                    case_id_value = str(decrypted_case_id)  # Proper UUID format
                 else:
-                    # Show encrypted value if password is invalid
-                    case_id_uuid = block_head.case_id.hex()
-                unique_cases.add(case_id_uuid)
+                    # Fallback for invalid/missing password
+                    case_id_value = block_head.case_id.hex()
+                unique_cases.add(case_id_value)
             except (ValueError, Exception):
                 print("Error: Invalid or malformed case_id in the blockchain.", file=sys.stderr)
                 sys.exit(1)
