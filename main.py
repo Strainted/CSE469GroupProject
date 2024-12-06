@@ -12,7 +12,8 @@ from verify import verify_blockchain
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
-
+# This function was generated with assistance from ChatGPT, an AI tool developed by OpenAI.
+# Reference: OpenAI. (2024). ChatGPT [Large language model]. openai.com/chatgpt
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Blockchain Chain of Custody Program")
 
