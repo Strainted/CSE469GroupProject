@@ -1,19 +1,24 @@
 import struct
 import os
 import sys
+import uuid
 from collections import namedtuple
-from add import decrypt_data, AES_KEY, BLOCK_FORMAT
+from add import decrypt_data, encrypt_data, AES_KEY, BLOCK_FORMAT
 from init import GENESIS_BLOCK
 
-def show_cases(file_path):
+def verify_password(password):
+    # Password verification logic (mock example)
+    valid_passwords = ["C67C", "P80P", "A65A", "E69E", "L76L"]
+    if password in valid_passwords:
+        return True
+    return False
+
+def show_cases(file_path, password=None):
     if not os.path.exists(file_path):
         print("Error: Blockchain file does not exist.", file=sys.stderr)
         sys.exit(1)
 
-    # Define valid states for case inclusion
-    VALID_STATES = [b'CHECKEDIN', b'CHECKEDOUT']
-
-    # Use a set to track unique cases
+    # Track unique cases
     unique_cases = set()
 
     with open(file_path, 'rb') as f:
@@ -34,25 +39,28 @@ def show_cases(file_path):
                 f.read(block_head.data_length)  # Skip block data
                 continue
 
-            # Filter blocks based on valid states
-            if block_head.state.rstrip(b'\x00') not in VALID_STATES:
-                f.read(block_head.data_length)  # Skip block data
-                continue
-
-            # Decrypt case ID and add to unique cases
-            decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).hex()
-            unique_cases.add(decrypted_case_id)
+            # Decrypt case_id or show encrypted value based on password validity
+            try:
+                if verify_password(password):
+                    decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY)
+                    case_id_uuid = str(uuid.UUID(bytes=decrypted_case_id))  # Convert to UUID format
+                else:
+                    # Show encrypted value if password is invalid
+                    case_id_uuid = block_head.case_id.hex()
+                unique_cases.add(case_id_uuid)
+            except (ValueError, Exception):
+                print("Error: Invalid or malformed case_id in the blockchain.", file=sys.stderr)
+                sys.exit(1)
 
             # Skip block data
             f.read(block_head.data_length)
 
     # Display the unique cases
-   # print("Displaying all cases:")
+    #print("Displaying all cases:")
     for i, case_id in enumerate(unique_cases, start=1):
         print(f"- Case {i}: {case_id}")
 
     return
-
 
 
 def show_items(file_path, case_id=None):
