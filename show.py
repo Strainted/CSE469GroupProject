@@ -47,7 +47,7 @@ def show_cases(file_path):
             f.read(block_head.data_length)
 
     # Display the unique cases
-    print("Displaying all cases:")
+   # print("Displaying all cases:")
     for i, case_id in enumerate(unique_cases, start=1):
         print(f"- Case {i}: {case_id}")
 
