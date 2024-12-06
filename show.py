@@ -53,7 +53,7 @@ def show_cases(file_path, password=None):
 
     # Display the unique cases
     for i, case_id in enumerate(unique_cases, start=1):
-        print(f"- Case {i}: {case_id}")  # Proper UUID format is used directly in the print
+        print(f"Case {i}: {case_id}")  # Proper UUID format is used directly in the print
 
     return
 
