@@ -1,5 +1,6 @@
 import struct
 import os
+import binascii
 from add import decrypt_data, AES_KEY
 from collections import namedtuple
 from datetime import datetime
@@ -31,9 +32,13 @@ def show_cases(file_path):
             if block_head.case_id == b'0' * 32:
                 continue
 
-            # Decrypt and store unique case IDs
-            decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).decode('utf-8')
-            unique_cases.add(decrypted_case_id)
+            try:
+                # Validate and decrypt case_id
+                decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).decode('utf-8')
+                unique_cases.add(decrypted_case_id)
+            except (binascii.Error, ValueError):
+                # Skip invalid or non-decryptable case IDs
+                continue
 
             # Skip block data
             f.read(block_head.data_length)
