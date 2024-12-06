@@ -44,6 +44,8 @@ def create_block(block_data):
     ) + DATA_FORMAT.pack(block_data['data'])
 
 
+
+
 def get_passwords():
     passwords = {
         "POLICE": os.getenv("BCHOC_PASSWORD_POLICE"),
@@ -55,6 +57,7 @@ def get_passwords():
     return passwords
 
 
+
 def verify_user(input_pass):
     passwords = get_passwords()
     if input_pass != passwords["CREATOR"]:
@@ -62,14 +65,17 @@ def verify_user(input_pass):
         invalid_password()
     return True
 
+# This function was generated with assistance from ChatGPT, an AI tool developed by OpenAI.
+# Reference: OpenAI. (2024). ChatGPT [Large language model]. openai.com/chatgpt
 
 def encrypt_data(data, key):
-    # Ensure the data is a multiple of 16 bytes for AES encryption
     cipher = AES.new(key, AES.MODE_ECB)
     padded_data = data + b'\0' * (16 - len(data) % 16)
     encrypted_data = cipher.encrypt(padded_data)
     return binascii.hexlify(encrypted_data)
 
+# This function was generated with assistance from ChatGPT, an AI tool developed by OpenAI.
+# Reference: OpenAI. (2024). ChatGPT [Large language model]. openai.com/chatgpt
 
 def decrypt_data(encrypted_data, key):
     cipher = AES.new(key, AES.MODE_ECB)

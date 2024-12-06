@@ -57,7 +57,7 @@ def remove_item(item_id, reason, password, owner, file_path):
 
             if item_id_int == item_id:
                 # Debugging output
-                print(f"Current state of item {item_id}: {curr_head.state}", file=sys.stderr)
+
 
                 # Check the state
                 if curr_head.state.rstrip(b'\x00') == b'CHECKEDIN':
