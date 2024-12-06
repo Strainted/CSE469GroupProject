@@ -9,43 +9,39 @@ from init import GENESIS_BLOCK
 BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
 
 def show_cases(file_path):
-    """
-    Display all unique cases in the blockchain file, excluding the Genesis block.
-    """
     if not os.path.exists(file_path):
-        print("Blockchain file not found.")
-        return
+        print("Error: Blockchain file does not exist.")
+        sys.exit(1)
 
-    cases = {}  # Dictionary to store unique case IDs with their associated count
-
+    unique_cases = set()
     with open(file_path, 'rb') as f:
         while True:
-            # Read block header
+            # Read the block header
             head = f.read(BLOCK_FORMAT.size)
             if not head:
                 break
-
+            
+            # Unpack the block
             block_head = namedtuple(
                 'Block_Head',
-                'prev_hash timestamp case_id evidence_id state creator owner data_length'
+                'prev_hash timestamp case_id item_id state creator owner data_length'
             )._make(BLOCK_FORMAT.unpack(head))
+            
+            # Skip genesis block
+            if block_head.case_id == b'0' * 32:
+                continue
 
-            # Read block data (skipping over data length bytes)
-            data_length = block_head.data_length
-            f.read(data_length)
+            # Decrypt and store unique case IDs
+            decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).decode('utf-8')
+            unique_cases.add(decrypted_case_id)
 
-            # Decrypt the case ID
-            decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY)
+            # Skip block data
+            f.read(block_head.data_length)
 
-            # Skip the Genesis block (case_id is all zeros)
-            if decrypted_case_id != GENESIS_BLOCK['case_id']:
-                case_uuid = decrypted_case_id.hex()
-                cases[case_uuid] = cases.get(case_uuid, 0) + 1
-
-    # Display cases in the required format
+    # Display unique cases
     print("Displaying all cases:")
-    for idx, case in enumerate(cases.keys(), start=1):
-        print(f"- Case {idx}: {case}")
+    for i, case_id in enumerate(unique_cases, start=1):
+        print(f"- Case {i}: {case_id}")
 
 
 def show_items(file_path, case_id=None):
