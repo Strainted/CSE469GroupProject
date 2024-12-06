@@ -12,6 +12,7 @@ from verify import verify_blockchain
 
 BLOCKCHAIN_FILE = os.getenv('BCHOC_FILE_PATH', 'blockchain.dat')
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Blockchain Chain of Custody Program")
 
@@ -46,8 +47,10 @@ def parse_arguments():
     # Remove command
     remove_parser = subparsers.add_parser('remove')
     remove_parser.add_argument('-i', '--item_id', required=True)
-    remove_parser.add_argument('-y', '--reasonY', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'], dest='reason')
-    remove_parser.add_argument('--why', '--reasonW', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'], dest='reason')
+    remove_parser.add_argument('-y', '--reasonY', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'],
+                               dest='reason')
+    remove_parser.add_argument('--why', '--reasonW', required=False, choices=['DISPOSED', 'DESTROYED', 'RELEASED'],
+                               dest='reason')
     remove_parser.add_argument('-p', '--password', required=True)
     remove_parser.add_argument('-o', '--owner')
 
@@ -59,16 +62,17 @@ def parse_arguments():
 
     return parser.parse_args()
 
+
 def main():
     args = parse_arguments()
-    
+
     if args.command == 'init':
         init(BLOCKCHAIN_FILE)
         return
-        
+
     elif args.command == 'add':
         case_id = args.case_id
-        item_ids = [int(id) for id in args.item_id] 
+        item_ids = [int(id) for id in args.item_id]
         creator = args.creator
         password = args.password
         add_block(case_id, item_ids, creator, password, BLOCKCHAIN_FILE)
@@ -78,23 +82,29 @@ def main():
         item_id = int(args.item_id)
         password = args.password
         check_out(item_id, password, BLOCKCHAIN_FILE)
-        return 
+        return
 
     elif args.command == 'checkin':
         item_id = int(args.item_id)
         password = args.password
         check_in(item_id, password, BLOCKCHAIN_FILE)
-        return 
+        return
 
     elif args.command == 'show':
+        show = Show()
         if args.subcommand == 'cases':
-            show_cases(BLOCKCHAIN_FILE)
+            show.show_cases(BLOCKCHAIN_FILE)
             return
         elif args.subcommand == 'items':
+            if not args.case_id:
+                print("Missing case_id for show items")
+                sys.exit(1)
+            show = Show()
+            show.show_items(BLOCKCHAIN_FILE, args.case_id)
             return
         elif args.subcommand == 'history':
             return
-        
+
     elif args.command == 'remove':
         item_id = int(args.item_id)
         password = args.password
@@ -109,6 +119,7 @@ def main():
     elif args.command == 'verify':
         verify_blockchain(BLOCKCHAIN_FILE)
         return
+
 
 if __name__ == "__main__":
     main()

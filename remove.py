@@ -2,6 +2,7 @@
 import os
 import struct
 import hashlib
+import uuid
 from collections import namedtuple
 from datetime import datetime
 from add import create_block, encrypt_data, decrypt_data, get_passwords
@@ -57,7 +58,7 @@ def remove_item(item_id, reason, password, owner, file_path):
 
             if item_id_int == item_id:
                 # Debugging output
-                print(f"Current state of item {item_id}: {curr_head.state}", file=sys.stderr)
+
 
                 # Check the state
                 if curr_head.state.rstrip(b'\x00') == b'CHECKEDIN':
@@ -102,6 +103,7 @@ def remove_item(item_id, reason, password, owner, file_path):
     # Append the block
     with open(file_path, 'ab') as f:
         f.write(new_block)
+    print(f"Case: {uuid.UUID(bytes=decrypt_data(case_id, AES_KEY))}")
     print(f"Removed item: {item_id}")
     print(f"Reason: {reason}")
     print(f"Time of action: {datetime.now().isoformat()}Z")

@@ -1,4 +1,3 @@
-# verify.py
 
 import os
 import sys
@@ -10,7 +9,6 @@ from collections import namedtuple
 from add import decrypt_data, AES_KEY, BLOCK_FORMAT
 from error import *
 from init import GENESIS_BLOCK, create_block
-
 
 def verify_blockchain(file_path):
     if not os.path.exists(file_path):

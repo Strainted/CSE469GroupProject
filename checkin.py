@@ -1,4 +1,3 @@
-
 import os
 import sys
 from error import *
@@ -9,7 +8,7 @@ import struct
 import hashlib
 from checkout import verify_user
 from add import create_block, encrypt_data, decrypt_data, get_passwords
-
+import uuid
 
 AES_KEY = b"R0chLi4uLi4uLi4="
 BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
@@ -20,8 +19,6 @@ def check_in(item_id, password, file_path):
 
     if not os.path.exists(file_path):
         print("Block chain file does not exist")
-
-    # maybe validate file will have to see but i dont think so
 
     prev_ids = []
 
@@ -55,7 +52,7 @@ def check_in(item_id, password, file_path):
                     checkedin = False
 
                 if curr_head.state.rstrip(b'\x00') in [b'CHECKEDIN', b'DISPOSED', b'RELEASED',
-                                                    b'DESTROYED']:  # double check this works after doing remove
+                                                       b'DESTROYED']:  # double check this works after doing remove
                     checkedin = True
                     found = False
 
@@ -86,7 +83,7 @@ def check_in(item_id, password, file_path):
 
     with open(file_path, 'ab') as f:
         f.write(new_block)
-        print(f"Case: {decrypt_data(case_id, AES_KEY)}")
+        print(f"Case: {uuid.UUID(bytes=decrypt_data(case_id, AES_KEY))}")
         print(f"Checking out item: {item_id}")
         print("Status: CHECKEDIN")
         print(f"Time of action: {datetime.now().isoformat()}Z")

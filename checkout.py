@@ -80,10 +80,11 @@ def check_out(item_id, password, file_path):
     }
 
     new_block = create_block(block_data)
+    print()
 
     with open(file_path, 'ab') as f:
         f.write(new_block)
-        print(f"Case: {decrypt_data(case_id, AES_KEY)}")
+        print(f"Case: {uuid.UUID(bytes=decrypt_data(case_id, AES_KEY))}")
         print(f"Checked out item: {item_id}")
         print("Status: CHECKEDOUT")
         print(f"Time of action: {datetime.now().isoformat()}Z")

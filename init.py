@@ -10,8 +10,8 @@ from error import *
 GENESIS_BLOCK = {
     'prev_hash': b'0' * 32,          # 32 bytes
     'timestamp': 0.0,           # 08 bytes
-    'case_id': b'0' * 32,            # 32 bytes
-    'evidence_id': b'0' * 32,        # 32 bytes
+    'case_id': b'0' * 32,  # 32 bytes
+    'evidence_id': b'0' * 32,  # 32 bytes
     'state': b'INITIAL\0\0\0\0\0',   # 12 bytes
     'creator': b'\0' * 12,           # 12 bytes
     'owner': b'\0' * 12,             # 12 bytes
