@@ -13,8 +13,6 @@ def verify_password(password):
     if password in valid_passwords:
         return True
     return False
-
-
 def show_cases(file_path, password=None):
     if not os.path.exists(file_path):
         print("Error: Blockchain file does not exist.", file=sys.stderr)
@@ -65,6 +63,7 @@ def show_cases(file_path, password=None):
         print(f"- Case {i}: {case_id}")
 
     return
+
 
 
 
