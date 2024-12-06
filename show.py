@@ -1,65 +1,58 @@
-import os
 import struct
+import os
+import sys
 from collections import namedtuple
-from add import decrypt_data, AES_KEY
-
-# Define the block format for struct unpacking
-BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
-
+from add import decrypt_data, AES_KEY, BLOCK_FORMAT
+from init import GENESIS_BLOCK
 
 def show_cases(file_path):
-    # Check if the blockchain file exists
     if not os.path.exists(file_path):
-        print("Error: Blockchain file does not exist.")
+        print("Error: Blockchain file does not exist.", file=sys.stderr)
         sys.exit(1)
 
-    # Initialize a set to store unique case IDs
+    # Define valid states for case inclusion
+    VALID_STATES = [b'CHECKEDIN', b'CHECKEDOUT']
+
+    # Use a set to track unique cases
     unique_cases = set()
 
-    try:
-        with open(file_path, 'rb') as f:
-            while True:
-                # Read the block header
-                head = f.read(BLOCK_FORMAT.size)
-                if not head:
-                    break  # End of file
+    with open(file_path, 'rb') as f:
+        while True:
+            # Read the block header
+            head = f.read(BLOCK_FORMAT.size)
+            if not head:
+                break
 
-                # Check for incomplete block header
-                if len(head) < BLOCK_FORMAT.size:
-                    print("Error: Incomplete block header.")
-                    sys.exit(1)
+            # Unpack the block header
+            block_head = namedtuple(
+                'Block_Head',
+                'prev_hash timestamp case_id evidence_id state creator owner data_length'
+            )._make(BLOCK_FORMAT.unpack(head))
 
-                # Unpack the block header
-                block_head = namedtuple(
-                    'Block_Head',
-                    'prev_hash timestamp case_id evidence_id state creator owner data_length'
-                )._make(BLOCK_FORMAT.unpack(head))
+            # Skip genesis block
+            if block_head.case_id == b'0' * 32:
+                f.read(block_head.data_length)  # Skip block data
+                continue
 
-                # Skip the genesis block (case_id is all zeros)
-                if block_head.case_id == b'\x00' * 32:
-                    continue
+            # Filter blocks based on valid states
+            if block_head.state.rstrip(b'\x00') not in VALID_STATES:
+                f.read(block_head.data_length)  # Skip block data
+                continue
 
-                # Decrypt and store unique case IDs only if the state is valid
-                try:
-                    state_str = block_head.state.rstrip(b'\x00').decode()
-                    if state_str not in ['DISPOSED', 'DESTROYED', 'RELEASED']:
-                        decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).hex()
-                        unique_cases.add(decrypted_case_id)
-                except Exception:
-                    print("Error: Failed to decrypt case ID.")
-                    sys.exit(1)
+            # Decrypt case ID and add to unique cases
+            decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).hex()
+            unique_cases.add(decrypted_case_id)
 
-                # Skip block data
-                f.read(block_head.data_length)
+            # Skip block data
+            f.read(block_head.data_length)
 
-        # Display unique case IDs
-        print("Displaying all cases:")
-        for i, case_id in enumerate(sorted(unique_cases), start=1):  # Sorting for consistent test output
-            print(f"- Case {i}: {case_id}")
+    # Display the unique cases
+    print("Displaying all cases:")
+    for i, case_id in enumerate(unique_cases, start=1):
+        print(f"- Case {i}: {case_id}")
 
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        sys.exit(1)
+    return
+
 
 
 def show_items(file_path, case_id=None):
