@@ -1,10 +1,7 @@
 import struct
 import os
-import binascii
 from add import decrypt_data, AES_KEY
 from collections import namedtuple
-from datetime import datetime
-from init import GENESIS_BLOCK
 
 # Define the block format for struct unpacking
 BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
@@ -15,37 +12,48 @@ def show_cases(file_path):
         sys.exit(1)
 
     unique_cases = set()
+
     with open(file_path, 'rb') as f:
         while True:
             # Read the block header
             head = f.read(BLOCK_FORMAT.size)
+
+            # Exit if no more data
             if not head:
                 break
-            
-            # Unpack the block
+
+            # Ensure we read a full block header
+            if len(head) < BLOCK_FORMAT.size:
+                print("Error: Incomplete block header.")
+                sys.exit(1)
+
+            # Unpack the block header
             block_head = namedtuple(
                 'Block_Head',
                 'prev_hash timestamp case_id item_id state creator owner data_length'
             )._make(BLOCK_FORMAT.unpack(head))
-            
-            # Skip genesis block
+
+            # Skip the genesis block (or blocks with empty case_id)
             if block_head.case_id == b'0' * 32:
                 continue
 
+            # Read and skip the block data
+            data = f.read(block_head.data_length)
+            if len(data) < block_head.data_length:
+                print("Error: Incomplete block data.")
+                sys.exit(1)
+
+            # Decrypt the case ID and add it to the set
             try:
-                # Validate and decrypt case_id
                 decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).decode('utf-8')
                 unique_cases.add(decrypted_case_id)
-            except (binascii.Error, ValueError):
-                # Skip invalid or non-decryptable case IDs
-                continue
-
-            # Skip block data
-            f.read(block_head.data_length)
+            except Exception as e:
+                print(f"Error decrypting case ID: {e}")
+                sys.exit(1)
 
     # Display unique cases
     print("Displaying all cases:")
-    for i, case_id in enumerate(unique_cases, start=1):
+    for i, case_id in enumerate(sorted(unique_cases), start=1):
         print(f"- Case {i}: {case_id}")
 
 
