@@ -91,10 +91,18 @@ def main():
             show_cases(BLOCKCHAIN_FILE)
             return
         elif args.subcommand == 'items':
+            show_items(BLOCKCHAIN_FILE, args.case_id)
             return
         elif args.subcommand == 'history':
+            show_history(
+                BLOCKCHAIN_FILE,
+                item_id=int(args.item_id) if args.item_id else None,
+                num_entries=args.num_entries,
+                reverse=args.reverse,
+                password=args.password,
+            )
             return
-        
+  
     elif args.command == 'remove':
         item_id = int(args.item_id)
         password = args.password
