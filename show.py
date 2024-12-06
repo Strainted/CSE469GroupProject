@@ -153,7 +153,7 @@ def show_history(file_path, item_id=None, num_entries=None, reverse=False, passw
         history = history[:num_entries]
 
     # Display history in the required format
-    print("Displaying history:")
+   # print("Displaying history:")
     for entry in history:
         print(f"> Case: {entry['case_id']}")
         print(f"> Item: {entry['item_id']}")
