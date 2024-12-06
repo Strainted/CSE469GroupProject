@@ -2,10 +2,10 @@ import os
 import struct
 from collections import namedtuple
 from add import decrypt_data, AES_KEY
-from error import *
 
 # Define the block format for struct unpacking
 BLOCK_FORMAT = struct.Struct("32s d 32s 32s 12s 12s 12s I")
+
 
 def show_cases(file_path):
     # Check if the blockchain file exists
@@ -39,10 +39,12 @@ def show_cases(file_path):
                 if block_head.case_id == b'\x00' * 32:
                     continue
 
-                # Decrypt and store unique case IDs
+                # Decrypt and store unique case IDs only if the state is valid
                 try:
-                    decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).hex()
-                    unique_cases.add(decrypted_case_id)
+                    state_str = block_head.state.rstrip(b'\x00').decode()
+                    if state_str not in ['DISPOSED', 'DESTROYED', 'RELEASED']:
+                        decrypted_case_id = decrypt_data(block_head.case_id, AES_KEY).hex()
+                        unique_cases.add(decrypted_case_id)
                 except Exception:
                     print("Error: Failed to decrypt case ID.")
                     sys.exit(1)
@@ -52,13 +54,12 @@ def show_cases(file_path):
 
         # Display unique case IDs
         print("Displaying all cases:")
-        for i, case_id in enumerate(unique_cases, start=1):
+        for i, case_id in enumerate(sorted(unique_cases), start=1):  # Sorting for consistent test output
             print(f"- Case {i}: {case_id}")
 
     except Exception as e:
         print(f"Error: {str(e)}")
         sys.exit(1)
-
 
 
 def show_items(file_path, case_id=None):
